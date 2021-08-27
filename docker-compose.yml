@@ -1,0 +1,49 @@
+version: '3.7'
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: ../docker/server/Dockerfile
+    image: myapp-server
+    container_name: tracking-app-server
+    volumes:
+      - ./server/:/usr/src/server
+      - /usr/src/server/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+    environment:
+      - NODE_ENV=production
+    networks:
+      - app-network
+  database:
+    image: mongo
+    volumes:
+      - mongodb:/data/db
+    networks:
+      - app-network
+  client:
+    build:
+      context: ./client
+      dockerfile: ../docker/client/Dockerfile
+    image: myapp-client
+    container_name: tracking-app-client
+    volumes:
+      - ./client/:/usr/src/client
+      - /usr/src/client/node_modules
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    mongodb:
+    node_modules:
+    web-root:
+      driver: local
