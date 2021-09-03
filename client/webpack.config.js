@@ -1,18 +1,22 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const webpack = require('webpack')
-const autoprefixer = require('autoprefixer')
-const env = require('dotenv-webpack')
+const path = require("path")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
+const webpack = require("webpack")
+const autoprefixer = require("autoprefixer")
+const env = require("dotenv-webpack")
+const tailwindcss = require("tailwindcss")
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
 const config = {
   entry: "./src/index.js",
   output: {
-    filename: '[name].[chunkhash].bundle.js',
+    filename: "[name].[chunkhash].bundle.js",
     path: path.resolve(__dirname, "build"),
+    publicPath: "/",
   },
   devServer: {
     contentBase: path.resolve(__dirname, "build"),
-    host: '0.0.0.0'
+    host: "0.0.0.0",
+    historyApiFallback: true,
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -21,7 +25,9 @@ const config = {
 
     new webpack.HotModuleReplacementPlugin(),
 
-    new env()
+    new env(),
+
+    new MiniCssExtractPlugin(),
   ],
 
   optimization: {
@@ -38,7 +44,7 @@ const config = {
       name: "manifest",
     },
   },
-  
+
   module: {
     rules: [
       {
@@ -57,10 +63,8 @@ const config = {
             loader: "postcss-loader",
             options: {
               postcssOptions: {
-                plugins: [
-                  autoprefixer
-                ]
-              }
+                plugins: [autoprefixer, tailwindcss("./tailwind.config.js")],
+              },
             },
           },
           {
@@ -81,11 +85,18 @@ const config = {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         loader: "file-loader",
         options: {
-          name: 'images/[name].[ext]',
+          name: "images/[name].[ext]",
         },
+      },
+      {
+        test: /\.(svg|eot|woff|woff2|ttf)$/,
+        loader: "file-loader",
+        options: {
+          outputPath: "../fonts",
+        }
       },
     ],
   },
-};
+}
 
-module.exports = config;
+module.exports = config
