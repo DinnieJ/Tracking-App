@@ -18,6 +18,12 @@ const config = {
     host: "0.0.0.0",
     historyApiFallback: true,
   },
+
+  resolve: {
+    alias: {
+      '@': path.join(__dirname, 'src')
+    }
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: "./src/index.html",
@@ -91,9 +97,6 @@ const config = {
       {
         test: /\.(svg|eot|woff|woff2|ttf)$/,
         loader: "file-loader",
-        options: {
-          outputPath: "../fonts",
-        }
       },
     ],
   },

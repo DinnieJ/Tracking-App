@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from "react"
-import Loading from "../common/Loading"
+import React, { useState, useEffect, useRef } from "react"
+import Loading from "@/components/common/Loading"
+import { register } from "@/api/auth"
+import { useDispatch } from "react-redux"
+import { SHOW_NOTIFICATION } from "../../store/notification/notificationAction"
+import { useHistory } from "react-router"
 
 const RegisterForm = () => {
   const [name, setName] = useState("")
@@ -7,14 +11,31 @@ const RegisterForm = () => {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
 
-  const onSubmitForm = (e) => {
+  const dispatch = useDispatch()
+  const history = useHistory()
+
+  const _isMounted = useRef(true)
+
+  useEffect(() => {
+    return () => {
+      _isMounted.current = false
+    }
+  })
+
+  const onSubmitForm = async (e) => {
     e.preventDefault()
     setLoading(true)
-    setTimeout(
-      () => setLoading(false), 
-      3000
-    );
-    console.log('ok')
+    await register({ name, username, password })
+      .then((res) => {
+        dispatch({ type: SHOW_NOTIFICATION, payload: { message: "Register successful!" } })
+        history.push("/login")
+      })
+      .catch((err) => {
+        dispatch({ type: SHOW_NOTIFICATION, payload: { message: `${err.response.data.message}` } })
+      })
+      .finally(() => {
+        if(_isMounted) setLoading(false)
+      })
   }
 
   return (
@@ -44,12 +65,11 @@ const RegisterForm = () => {
       <button
         type="submit"
         className={`flex justify-center items-center rounded-full w-40 px-4 py-2 my-2 cursor-pointer text-lg font-light text-white 
-        ${loading ? "bg-gray-400" : "bg-green-600 hover:bg-green-900"}`
-        }
+        ${loading ? "bg-gray-400" : "bg-green-600 hover:bg-green-900"}`}
         disabled={loading}
-      >{
-          loading ? <Loading/> : 'Register'
-      }</button>
+      >
+        {loading ? <Loading /> : "Register"}
+      </button>
     </form>
   )
 }

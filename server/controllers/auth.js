@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken')
 
 const login = async (req, res) => {
     const { username, password } = req.body
-
+    setTimeout(() => {console.log('ook')}, 3000)
     try {
         await UserRepository.findUserByCreds(username, password)
         .then((user) => {
@@ -45,11 +45,10 @@ const signup = async (req, res) => {
         await newUser.save().then(() => {
             res.status(200).json({ message: 'Create user successful' })
         }).catch(err => {
-            console.log(err)
-            res.status(400).json(err)
+            throw err
         })
     } catch (e) {
-        res.status(500).json({message: 'Something went wrong'})
+        res.status(400).json({message: 'Something went wrong'})
     }
 
 }
@@ -69,6 +68,10 @@ const fetchUser = async (req, res) => {
     }
 
     
+}
+
+const logout = async (req, res) => {
+    const token = req.headers.authorization.replace('Bearer ', '') 
 }
 
 
